@@ -8,9 +8,9 @@ import (
 	"github.com/vulkan-go/vulkan"
 )
 
-const WINDOW_WIDTH int32 = 640
-const WINDOW_HEIGHT int32 = 480
-const WINDOW_TITLE string = "SDL2_Vulkan"
+const WindowWidth int32 = 640
+const WindowHeight int32 = 480
+const WindowTitle string = "SDL2_Vulkan"
 
 func checkErr(err error) {
 	if err == nil {
@@ -39,16 +39,17 @@ func main() {
 	checkErr(err)
 
 	// app system
-
-	mainApplication := amberCore.NewApplication()
+	mainApplication := amberCore.NewApplication(
+		"SDL2test",
+		false)
 
 	// create a window
 	window, err := sdl.CreateWindow(
-		WINDOW_TITLE,
+		WindowTitle,
 		sdl.WINDOWPOS_CENTERED,
 		sdl.WINDOWPOS_CENTERED,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
+		WindowWidth,
+		WindowHeight,
 		sdl.WINDOW_VULKAN)
 
 	checkErr(err)
@@ -60,29 +61,41 @@ func main() {
 	checkErr(err)
 
 	mainApplication.VulkanSwapchainDimensions(
-		uint32(WINDOW_WIDTH),
-		uint32(WINDOW_HEIGHT))
+		uint32(WindowWidth),
+		uint32(WindowHeight))
 
 	swapchain := mainApplication.Context().SwapchainDimensions()
 
 	fmt.Printf("Vulkan: %s with %+v swapchain\n",
-		WINDOW_TITLE,
+		WindowTitle,
 		swapchain)
 
-	//window.Show()
 	// Delta Time
-	// main loop
+	//fpsDelay := time.Second / 60
+	//fpsTicker := time.NewTicker(fpsDelay)
+	//start := time.Now()
+	//frames := 0
 
-	// systemize the vulkan workflow
+	// main loop
+	running := true
+	for running {
+
+		// poll events
+		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+			switch event.(type) {
+			case *sdl.QuitEvent:
+				println("Quit")
+				running = false
+				break
+			}
+		}
+
+		// systemize the vulkan workflow
+	}
 
 	// clean up
-
-	mainApplication.Destroy()
 	platform.Destroy()
-	err = window.Destroy()
-	if err != nil {
-		fmt.Println("[main] clean up: Unable to destroy window.")
-	}
+	mainApplication.Destroy()
 	sdl.VulkanUnloadLibrary()
 	sdl.Quit()
 

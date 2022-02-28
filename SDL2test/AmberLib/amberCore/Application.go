@@ -9,9 +9,20 @@ import (
 )
 
 type Application struct {
-	asche.BaseVulkanApp
 	WindowHandle *sdl.Window
+
+	name         string
 	debugEnabled bool
+
+	asche.BaseVulkanApp
+}
+
+func NewApplication(name string, enableDebug bool) *Application {
+	a := &Application{
+		name:         name,
+		debugEnabled: enableDebug,
+	}
+	return a
 }
 
 func (a *Application) VulkanSurface(instance vulkan.Instance) (surface vulkan.Surface) {
@@ -20,12 +31,13 @@ func (a *Application) VulkanSurface(instance vulkan.Instance) (surface vulkan.Su
 		log.Println("vulkan error:", err)
 		return vulkan.NullSurface
 	}
+
 	surf := vulkan.SurfaceFromPointer(uintptr(surfPtr))
 	return surf
 }
 
 func (a *Application) VulkanAppName() string {
-	return "SDL2test"
+	return a.name
 }
 
 func (a *Application) VulkanLayers() []string {
@@ -41,7 +53,7 @@ func (a *Application) VulkanLayers() []string {
 }
 
 func (a *Application) VulkanDebug() bool {
-	return false // a.debugEnabled
+	return a.debugEnabled
 }
 
 func (a *Application) VulkanDeviceExtensions() []string {
@@ -64,12 +76,6 @@ func (a *Application) VulkanInstanceExtensions() []string {
 		extensions = append(extensions, "VK_EXT_debug_report")
 	}
 	return extensions
-}
-
-/////////////////////////////////////////////////////////////////////////
-
-func NewApplication() *Application {
-	return &Application{}
 }
 
 func (a *Application) Destroy() {
